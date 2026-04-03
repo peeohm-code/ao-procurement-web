@@ -9,6 +9,8 @@ import {
   FolderOpen,
   Users,
   Settings,
+  Store,
+  LifeBuoy,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -37,6 +39,8 @@ export default function Sidebar({ user, onSignOut }: SidebarProps) {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/po', label: 'PO ทั้งหมด', icon: FileText },
     { href: '/projects', label: 'โครงการ', icon: FolderOpen },
+    { href: '/vendors', label: 'ร้านค้า', icon: Store },
+    { href: '/help', label: 'Help Center', icon: LifeBuoy },
     ...(user?.role === 'owner'
       ? [{ href: '/users', label: 'จัดการผู้ใช้', icon: Users }]
       : []),
