@@ -1,11 +1,31 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="8" fill="#00366D"/>
-  <path d="M4 24V8L12 4V10L8 12V24H4Z" fill="white"/>
-  <path d="M12 4L16 8V24H12V4Z" fill="white" opacity="0.8"/>
-  <circle cx="23" cy="16" r="8" fill="#00CE81"/>
-  <line x1="19" y1="10" x2="19" y2="22" stroke="white" stroke-width="1" opacity="0.5"/>
-  <line x1="21" y1="10" x2="21" y2="22" stroke="white" stroke-width="1" opacity="0.5"/>
-  <line x1="23" y1="10" x2="23" y2="22" stroke="white" stroke-width="1" opacity="0.5"/>
-  <line x1="25" y1="10" x2="25" y2="22" stroke="white" stroke-width="1" opacity="0.5"/>
-  <line x1="27" y1="10" x2="27" y2="22" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect width="32" height="32" rx="7" fill="#0A1628"/>
+  <!-- Scale the AO logo to fit 32x32 with padding -->
+  <!-- A shape (scaled from 86x86 to ~26x26, centered) -->
+  <defs>
+    <linearGradient id="fav-ag" x1="3" y1="29" x2="14" y2="3" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#00366D"/>
+      <stop offset="55%"  stop-color="#005A78"/>
+      <stop offset="100%" stop-color="#009E90"/>
+    </linearGradient>
+    <clipPath id="fav-oc">
+      <circle cx="22" cy="19" r="8"/>
+    </clipPath>
+  </defs>
+  <!-- A: scaled ~0.37x from viewBox 86→32 minus padding, shifted +3 -->
+  <path
+    d="M 3,29 L 3,10 L 10,3 L 17,8 L 17,29 L 13,29 L 13,20 L 7,20 L 7,29 Z"
+    fill="url(#fav-ag)"
+  />
+  <!-- O circle -->
+  <circle cx="22" cy="19" r="8" fill="#009B60"/>
+  <!-- O stripes (6 stripes in clip) -->
+  <g clip-path="url(#fav-oc)">
+    <rect x="14" y="11" width="2.67" height="16" fill="#00CE81"/>
+    <rect x="16.67" y="11" width="2.67" height="16" fill="#009B60"/>
+    <rect x="19.33" y="11" width="2.67" height="16" fill="#00CE81"/>
+    <rect x="22" y="11" width="2.67" height="16" fill="#009B60"/>
+    <rect x="24.67" y="11" width="2.67" height="16" fill="#00CE81"/>
+    <rect x="27.33" y="11" width="2.67" height="16" fill="#009B60"/>
+  </g>
 </svg>

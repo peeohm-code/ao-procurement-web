@@ -1,37 +1,100 @@
 'use client'
 
+import { useId } from 'react'
+
 export default function AOLogo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
+  const uid = useId().replace(/:/g, '_')
+
   const sizes = {
-    sm: { w: 28, h: 28, text: 'text-xs' },
-    md: { w: 36, h: 36, text: 'text-sm' },
-    lg: { w: 48, h: 48, text: 'text-base' },
+    sm: { iconW: 44, iconH: 44, textPrimary: '8.5px', textSecondary: '6.5px', gap: 7 },
+    md: { iconW: 58, iconH: 58, textPrimary: '11px',   textSecondary: '8px',   gap: 9 },
+    lg: { iconW: 78, iconH: 78, textPrimary: '14px',   textSecondary: '10px',  gap: 12 },
   }
   const s = sizes[size]
 
+  // viewBox: 0 0 86 86  (nearly square — A tall+narrow, O circle ≈ A width)
+  // A occupies x=0..40, y=0..82
+  // O circle: cx=60 cy=50 r=22  (left edge=38, overlaps A by 2px)
+  const cX = 60, cY = 50, cR = 22
+  const numStripes = 12
+  const stripeW = (cR * 2) / numStripes
+
   return (
-    <div className="flex items-center gap-2.5">
-      <svg width={s.w} height={s.h} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* A shape - navy */}
-        <path d="M4 38V10L16 4V14L10 17V38H4Z" fill="#00366D" />
-        <path d="M16 4L22 10V38H16V4Z" fill="#004A8F" />
-        {/* O shape - gradient green */}
-        <circle cx="34" cy="24" r="13" fill="url(#ao-grad)" />
-        {/* Vertical lines in O */}
-        <g opacity="0.6">
-          {[28, 31, 34, 37, 40].map((x) => (
-            <line key={x} x1={x} y1="14" x2={x} y2="34" stroke="white" strokeWidth="1.2" />
+    <div className="flex items-center" style={{ gap: s.gap }}>
+      <svg
+        width={s.iconW}
+        height={s.iconH}
+        viewBox="0 0 86 86"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          {/* Gradient on A: deep navy at bottom → teal at top */}
+          <linearGradient
+            id={`ag${uid}`}
+            x1="0" y1="82" x2="32" y2="0"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%"   stopColor="#00366D" />
+            <stop offset="55%"  stopColor="#005A78" />
+            <stop offset="100%" stopColor="#009E90" />
+          </linearGradient>
+
+          {/* Clip stripes to O circle */}
+          <clipPath id={`oc${uid}`}>
+            <circle cx={cX} cy={cY} r={cR} />
+          </clipPath>
+        </defs>
+
+        {/*
+          A shape — letter A / building silhouette
+          Outer: (0,82)→(0,22)→peak(20,2)→(40,18)→(40,82)
+          Inner counter (open space): (29,82)→(29,50)→(11,50)→(11,82)
+        */}
+        <path
+          d="M 0,82 L 0,22 L 20,2 L 40,18 L 40,82 L 29,82 L 29,50 L 11,50 L 11,82 Z"
+          fill={`url(#ag${uid})`}
+        />
+
+        {/* O — base fill (dark green behind stripes) */}
+        <circle cx={cX} cy={cY} r={cR} fill="#009B60" />
+
+        {/* O — vertical stripes clipped to circle */}
+        <g clipPath={`url(#oc${uid})`}>
+          {Array.from({ length: numStripes }, (_, i) => (
+            <rect
+              key={i}
+              x={cX - cR + i * stripeW}
+              y={cY - cR}
+              width={stripeW}
+              height={cR * 2}
+              fill={i % 2 === 0 ? '#00CE81' : '#009B60'}
+            />
           ))}
         </g>
-        <defs>
-          <linearGradient id="ao-grad" x1="21" y1="24" x2="47" y2="24" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#00366D" />
-            <stop offset="1" stopColor="#00CE81" />
-          </linearGradient>
-        </defs>
       </svg>
-      <div className="flex flex-col leading-tight">
-        <span className={`font-bold text-ao-navy ${s.text}`}>CONSTRUCTION</span>
-        <span className={`font-normal text-gray-400 ${s.text}`} style={{ fontSize: '0.65em' }}>
+
+      <div className="flex flex-col leading-none">
+        <span
+          style={{
+            fontSize: s.textPrimary,
+            fontWeight: 700,
+            color: '#00366D',
+            letterSpacing: '0.08em',
+            lineHeight: 1.25,
+          }}
+        >
+          CONSTRUCTION
+        </span>
+        <span
+          style={{
+            fontSize: s.textSecondary,
+            fontWeight: 400,
+            color: '#9CA3AF',
+            letterSpacing: '0.06em',
+            lineHeight: 1.25,
+          }}
+        >
           AND ENGINEERING
         </span>
       </div>
