@@ -184,8 +184,14 @@ export default function POListPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-gray-400">
-                    ไม่พบ PO ที่ตรงกับเงื่อนไข
+                  <td colSpan={8} className="py-16">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 flex items-center justify-center mb-4">
+                        <Search size={24} className="text-gray-300" />
+                      </div>
+                      <p className="text-base font-semibold text-gray-600">ไม่พบ PO ที่ตรงกับเงื่อนไข</p>
+                      <p className="text-sm text-gray-400 mt-1">ลองเปลี่ยนตัวกรองหรือคำค้นหาใหม่</p>
+                    </div>
                   </td>
                 </tr>
               )}
