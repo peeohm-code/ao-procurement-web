@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import PostHogProvider from '@/components/PostHogProvider'
 
 export const metadata: Metadata = {
   title: 'AO Procurement | ระบบจัดซื้อ',
@@ -14,7 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      <body>{children}</body>
+      <body>
+        <PostHogProvider>{children}</PostHogProvider>
+      </body>
     </html>
   )
 }

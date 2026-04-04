@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { Search, Download, ChevronDown, ChevronRight, Package } from 'lucide-react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { Search, Download, ChevronDown, ChevronRight, Package, FileText, FileSpreadsheet, FileCog } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { formatCurrency, formatDateTime } from '@/lib/format'
 import StatusBadge from '@/components/StatusBadge'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui'
 import { TempQuotation, Project, POStatus, POItem, PAYMENT_LABELS } from '@/lib/types'
+import { exportCSV, exportExcel, exportPDF } from '@/lib/exportPO'
 
 export default function POListPage() {
   const [pos, setPOs] = useState<TempQuotation[]>([])
@@ -18,6 +19,9 @@ export default function POListPage() {
   const [sortField, setSortField] = useState<'created_at' | 'grand_total'>('created_at')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exporting, setExporting] = useState<'excel' | null>(null)
+  const exportRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -66,17 +70,23 @@ export default function POListPage() {
     })
   }
 
-  const exportCSV = () => {
-    const headers = ['เลขPO', 'โครงการ', 'ร้านค้า', 'เลขเอกสาร', 'ยอดเงิน', 'สถานะ', 'วิธีจ่าย', 'วันที่']
-    const rows = filtered.map(po => [po.id, po.project_id, po.shop_name, po.doc_number, po.grand_total, po.status, po.payment_method, po.created_at])
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `PO-export-${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
+  const handleExcelExport = async () => {
+    setExporting('excel')
+    setExportOpen(false)
+    try { await exportExcel(filtered) } finally { setExporting(null) }
   }
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!exportOpen) return
+    const handler = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [exportOpen])
 
   if (loading) {
     return <div className="animate-pulse"><div className="h-8 bg-gray-200 rounded w-48 mb-6" /><div className="h-96 bg-gray-200 rounded-xl" /></div>
@@ -84,20 +94,58 @@ export default function POListPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pl-12 lg:pl-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">PO ทั้งหมด</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">PO ทั้งหมด</h1>
           <p className="text-sm text-gray-400 mt-0.5">{filtered.length} รายการ</p>
         </div>
-        <button onClick={exportCSV} className="btn-secondary flex items-center gap-2 text-sm">
-          <Download size={16} /> Export CSV
-        </button>
+        {/* Export dropdown */}
+        <div className="relative" ref={exportRef}>
+          <button
+            onClick={() => setExportOpen(v => !v)}
+            className="btn-secondary flex items-center gap-2 text-sm"
+            disabled={exporting !== null}
+          >
+            {exporting ? (
+              <div className="w-4 h-4 border-2 border-ao-navy border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Download size={16} />
+            )}
+            <span className="hidden sm:inline">Export</span>
+            <ChevronDown size={14} className={`transition-transform ${exportOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {exportOpen && (
+            <div className="absolute right-0 top-full mt-1.5 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-30 py-1.5 overflow-hidden">
+              <button
+                onClick={() => { exportCSV(filtered); setExportOpen(false) }}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <FileCog size={15} className="text-gray-400" />
+                Export CSV
+              </button>
+              <button
+                onClick={handleExcelExport}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <FileSpreadsheet size={15} className="text-emerald-500" />
+                Export Excel (.xlsx)
+              </button>
+              <button
+                onClick={() => { exportPDF(filtered); setExportOpen(false) }}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <FileText size={15} className="text-red-500" />
+                Export PDF
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
       <div className="card p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[200px]">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
+          <div className="relative flex-1 min-w-0">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -107,19 +155,21 @@ export default function POListPage() {
               className="input-field pl-9"
             />
           </div>
-          <select value={filterProject} onChange={e => setFilterProject(e.target.value)} className="input-field w-auto min-w-[160px]">
-            <option value="all">ทุกโครงการ</option>
-            {projects.map(p => <option key={p.id} value={p.id}>{p.id} — {p.name}</option>)}
-          </select>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="input-field w-auto min-w-[140px]">
-            <option value="all">ทุกสถานะ</option>
-            <option value="paid">จ่ายแล้ว</option>
-            <option value="approved">อนุมัติ</option>
-            <option value="awaiting_transfer">รอโอน</option>
-            <option value="awaiting_receipt">รอใบเสร็จ</option>
-            <option value="pending_credit">รอเครดิต</option>
-            <option value="cancelled">ยกเลิก</option>
-          </select>
+          <div className="flex gap-3">
+            <select value={filterProject} onChange={e => setFilterProject(e.target.value)} className="input-field flex-1 min-w-0">
+              <option value="all">ทุกโครงการ</option>
+              {projects.map(p => <option key={p.id} value={p.id}>{p.id} — {p.name}</option>)}
+            </select>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="input-field flex-1 min-w-0">
+              <option value="all">ทุกสถานะ</option>
+              <option value="paid">จ่ายแล้ว</option>
+              <option value="approved">อนุมัติ</option>
+              <option value="awaiting_transfer">รอโอน</option>
+              <option value="awaiting_receipt">รอใบเสร็จ</option>
+              <option value="pending_credit">รอเครดิต</option>
+              <option value="cancelled">ยกเลิก</option>
+            </select>
+          </div>
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import LiffBanner from '@/components/LiffBanner'
 import { createClient } from '@/lib/supabase'
 import { UserProfile } from '@/lib/types'
 
@@ -64,9 +65,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* LINE LIFF banner — shows only when opened inside LINE app */}
+      <LiffBanner />
       <Sidebar user={user} onSignOut={handleSignOut} />
-      <main className="pl-60 min-h-screen">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* Desktop: offset by sidebar width. Mobile: no offset (sidebar is overlay) */}
+      <main className="lg:pl-60 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 pt-16 lg:pt-6">
           {children}
         </div>
       </main>

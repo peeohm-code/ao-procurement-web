@@ -146,9 +146,9 @@ export default function VendorsPage() {
   return (
     <TooltipProvider>
       <div className="space-y-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pl-12 lg:pl-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">ทะเบียนร้านค้า</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">ทะเบียนร้านค้า</h1>
             <p className="text-sm text-gray-400 mt-0.5">{vendors.length} ร้านค้า · {vendors.filter(hasBank).length} มีบัญชีธนาคาร</p>
           </div>
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -178,7 +178,7 @@ export default function VendorsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="card p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-ao-navy/10 flex items-center justify-center">
               <Store size={18} className="text-ao-navy" />
@@ -210,7 +210,8 @@ export default function VendorsPage() {
 
         {/* Vendor List */}
         <div className="card overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-100">
                 <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">ร้านค้า</th>
@@ -282,6 +283,7 @@ export default function VendorsPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </TooltipProvider>

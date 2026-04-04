@@ -268,9 +268,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      {/* Header — pl-12 on mobile to clear hamburger button */}
+      <div className="pl-12 lg:pl-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-400 mt-0.5">ภาพรวมระบบจัดซื้อทุกโครงการ</p>
       </div>
 

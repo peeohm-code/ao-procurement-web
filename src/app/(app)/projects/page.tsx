@@ -57,8 +57,8 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">โครงการทั้งหมด</h1>
+      <div className="pl-12 lg:pl-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">โครงการทั้งหมด</h1>
         <p className="text-sm text-gray-400 mt-0.5">{projects.length} โครงการ</p>
       </div>
 
